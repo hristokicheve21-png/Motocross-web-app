@@ -5,8 +5,8 @@ class App {
         this.modalContent = document.getElementById('modal-content');
         this.navAuth = document.getElementById('nav-auth');
         this.currentView = 'home';
-        
-        // Listen for history changes if we add pushState later, but for SPA simple hash/state is fine.
+
+        // Listen for history chang if we add pushState later, but for SPA simple hash/state is fine.
         window.addEventListener('popstate', (e) => {
             if (e.state && e.state.view) {
                 this.renderView(e.state.view);
@@ -159,9 +159,9 @@ class App {
 
     async renderView(view) {
         this.contentElement.innerHTML = '<div class="text-center" style="padding: 5rem;">Loading...</div>';
-        
+
         try {
-            switch(view) {
+            switch (view) {
                 case 'home':
                     await this.renderHome();
                     break;
@@ -278,7 +278,7 @@ class App {
         // GRAPH 1: Race Participation & Average Points (Simulated)
         // ---------------------------------------------------------
         const ctxRaces = document.getElementById('racesChart').getContext('2d');
-        
+
         // Use real race names, simulate participants & points for visual
         const raceLabels = races.slice(0, 5).map(r => r.name);
         if (raceLabels.length === 0) raceLabels.push('Sample Race 1', 'Sample Race 2');
@@ -342,9 +342,9 @@ class App {
         // ---------------------------------------------------------
         // GRAPH 2: Category Rankings (3 Small Graphs)
         // ---------------------------------------------------------
-        const youngRacers = racers.filter(r => r.categoryName && r.categoryName.includes('Young')).sort((a,b) => b.points - a.points).slice(0, 3);
-        const sportsmanRacers = racers.filter(r => r.categoryName && r.categoryName.includes('Sportsman')).sort((a,b) => b.points - a.points).slice(0, 3);
-        const proRacers = racers.filter(r => r.categoryName && r.categoryName.includes('Pro')).sort((a,b) => b.points - a.points).slice(0, 3);
+        const youngRacers = racers.filter(r => r.categoryName && r.categoryName.includes('Young')).sort((a, b) => b.points - a.points).slice(0, 3);
+        const sportsmanRacers = racers.filter(r => r.categoryName && r.categoryName.includes('Sportsman')).sort((a, b) => b.points - a.points).slice(0, 3);
+        const proRacers = racers.filter(r => r.categoryName && r.categoryName.includes('Pro')).sort((a, b) => b.points - a.points).slice(0, 3);
 
         const renderSmallChart = (canvasId, racerData, color) => {
             const ctx = document.getElementById(canvasId).getContext('2d');
@@ -413,10 +413,10 @@ class App {
     async renderRacers() {
         const racers = await db.getRacersAsync();
         const categories = await db.getCategoryAsync();
-        
+
         const gridHtml = this._generateCategorizedGrid(
-            racers, 
-            (racer) => this._createRacerCardHTML(racer), 
+            racers,
+            (racer) => this._createRacerCardHTML(racer),
             'No racers yet.'
         );
 
@@ -430,7 +430,7 @@ class App {
             </div>
             ${gridHtml}
         `;
-        
+
         this.contentElement.innerHTML = html;
         this.currentRacers = racers; // cache for search
     }
@@ -470,7 +470,7 @@ class App {
     async openAddRacerModal() {
         const categories = await db.getCategoryAsync();
         const catOptions = categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-        
+
         this.modalContent.innerHTML = `
             <h2>Add New Racer</h2>
             <form id="add-racer-form" onsubmit="event.preventDefault(); app.submitAddRacer();">
@@ -524,7 +524,7 @@ class App {
             alert('Please fill out all required fields.');
             return;
         }
-        
+
         const parsedAge = parseInt(age);
         if (parsedAge <= 0) {
             alert('Age must be a positive number.');
@@ -551,10 +551,10 @@ class App {
 
     async openEditRacerModal(racer) {
         const categories = await db.getCategoryAsync();
-        const catOptions = categories.map(c => 
+        const catOptions = categories.map(c =>
             `<option value="${c.name}" ${c.name === racer.categoryName ? 'selected' : ''}>${c.name}</option>`
         ).join('');
-        
+
         this.modalContent.innerHTML = `
             <h2>Edit Racer</h2>
             <form id="edit-racer-form" onsubmit="event.preventDefault(); app.submitEditRacer(${racer.id});">
@@ -631,14 +631,14 @@ class App {
     // --- Events View ---
     async renderEvents() {
         const races = await db.getRacesAsync();
-        
+
         // Split into active and expired based on Date
         const now = new Date();
         const activeRaces = [];
         const expiredRaces = [];
-        
+
         races.forEach(r => {
-            if (new Date(r.startDate) >= now.setHours(0,0,0,0)) {
+            if (new Date(r.startDate) >= now.setHours(0, 0, 0, 0)) {
                 activeRaces.push(r);
             } else {
                 expiredRaces.push(r);
@@ -646,8 +646,8 @@ class App {
         });
 
         const gridHtml = this._generateCategorizedGrid(
-            activeRaces, 
-            (race) => this._createRaceCardHTML(race), 
+            activeRaces,
+            (race) => this._createRaceCardHTML(race),
             'No active events.'
         );
 
@@ -661,18 +661,18 @@ class App {
             </div>
             ${gridHtml}
         `;
-        
+
         this.contentElement.innerHTML = html;
     }
 
     async renderExpiredEvents() {
         const races = await db.getRacesAsync();
         const now = new Date();
-        const expiredRaces = races.filter(r => new Date(r.startDate) < now.setHours(0,0,0,0));
+        const expiredRaces = races.filter(r => new Date(r.startDate) < now.setHours(0, 0, 0, 0));
 
         const gridHtml = this._generateCategorizedGrid(
-            expiredRaces, 
-            (race) => this._createRaceCardHTML(race, true), 
+            expiredRaces,
+            (race) => this._createRaceCardHTML(race, true),
             'No expired events.'
         );
 
@@ -683,7 +683,7 @@ class App {
             </div>
             ${gridHtml}
         `;
-        
+
         this.contentElement.innerHTML = html;
     }
 
@@ -710,7 +710,7 @@ class App {
     async openAddRaceModal() {
         const categories = await db.getCategoryAsync();
         const catOptions = categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-        
+
         this.modalContent.innerHTML = `
             <h2>Add New Event</h2>
             <form id="add-race-form" onsubmit="event.preventDefault(); app.submitAddRace();">
@@ -777,7 +777,7 @@ class App {
     // --- Tracks View ---
     async renderTracks() {
         const tracks = await db.getTracksAsync();
-        
+
         let html = `
             <div class="page-header">
                 <h2>Race Tracks</h2>
@@ -790,7 +790,7 @@ class App {
                 ${tracks.map(track => this._createTrackCardHTML(track)).join('')}
             </div>
         `;
-        
+
         this.contentElement.innerHTML = html;
     }
 
