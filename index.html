@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motocross App</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand" onclick="app.navigate('home')">
+            <span class="brand-text">MOTO<span class="accent">CROSS</span></span>
+        </div>
+        <div class="nav-links">
+            <button onclick="app.navigate('home')" class="nav-btn">Home</button>
+            <button onclick="app.navigate('events')" class="nav-btn">Events</button>
+            <button onclick="app.navigate('racers')" class="nav-btn">Racers</button>
+            <button onclick="app.navigate('tracks')" class="nav-btn">Tracks</button>
+        </div>
+        <div class="nav-auth" id="nav-auth">
+            <!-- Auth buttons injected by app.js -->
+        </div>
+    </nav>
+
+    <main id="app-content">
+        <!-- Content injected dynamically -->
+    </main>
+
+    <!-- Modal Container -->
+    <div id="modal-container" class="modal-container hidden">
+        <div class="modal-overlay" onclick="app.closeModal()"></div>
+        <div class="modal-content" id="modal-content">
+            <!-- Modal injected dynamically -->
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase Compat SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="db.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
