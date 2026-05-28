@@ -6,17 +6,14 @@ class App {
         this.navAuth = document.getElementById('nav-auth');
         this.currentView = 'home';
 
-        // Listen for history chang if we add pushState later, but for SPA simple hash/state is fine.
         window.addEventListener('popstate', (e) => {
             if (e.state && e.state.view) {
                 this.renderView(e.state.view);
             }
         });
 
-        // Listen for auth state changes
         authService.onAuthChange((user, role) => {
             this.renderAuthNav();
-            // Re-render current view to show/hide admin buttons
             this.renderView(this.currentView);
         });
     }
@@ -260,7 +257,6 @@ class App {
             </div>
         `;
 
-        // Render charts after the DOM is injected
         setTimeout(() => this.renderCharts(), 50);
     }
 
@@ -270,21 +266,16 @@ class App {
             return;
         }
 
-        // 1. Fetch real data
         const races = await db.getRacesAsync();
         const racers = await db.getRacersAsync();
 
-        // ---------------------------------------------------------
-        // GRAPH 1: Race Participation & Average Points (Simulated)
-        // ---------------------------------------------------------
         const ctxRaces = document.getElementById('racesChart').getContext('2d');
 
-        // Use real race names, simulate participants & points for visual
         const raceLabels = races.slice(0, 5).map(r => r.name);
         if (raceLabels.length === 0) raceLabels.push('Sample Race 1', 'Sample Race 2');
 
         const participantsData = raceLabels.map(() => Math.floor(Math.random() * 20) + 5);
-        const pointsData = raceLabels.map(() => Math.floor(Math.random() * 40) + 10); // Random points 10-50
+        const pointsData = raceLabels.map(() => Math.floor(Math.random() * 40) + 10);
 
         new Chart(ctxRaces, {
             type: 'bar',
@@ -339,9 +330,6 @@ class App {
             }
         });
 
-        // ---------------------------------------------------------
-        // GRAPH 2: Category Rankings (3 Small Graphs)
-        // ---------------------------------------------------------
         const youngRacers = racers.filter(r => r.categoryName && r.categoryName.includes('Young')).sort((a, b) => b.points - a.points).slice(0, 3);
         const sportsmanRacers = racers.filter(r => r.categoryName && r.categoryName.includes('Sportsman')).sort((a, b) => b.points - a.points).slice(0, 3);
         const proRacers = racers.filter(r => r.categoryName && r.categoryName.includes('Pro')).sort((a, b) => b.points - a.points).slice(0, 3);
@@ -364,7 +352,7 @@ class App {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    indexAxis: 'y', // Horizontal
+                    indexAxis: 'y',
                     scales: {
                         x: { display: false, beginAtZero: true },
                         y: { grid: { display: false }, ticks: { color: '#a0a0a0', font: { size: 10 } } }
@@ -382,7 +370,6 @@ class App {
         renderSmallChart('rankingPro', proRacers, 'rgba(141, 2, 31, 0.8)');
     }
 
-    // --- Shared Category Grid Helper ---
     _generateCategorizedGrid(items, cardGeneratorFn, emptyMessage) {
         const youngItems = items.filter(i => i.categoryName && i.categoryName.includes('Young'));
         const sportsmanItems = items.filter(i => i.categoryName && i.categoryName.includes('Sportsman'));
@@ -409,7 +396,6 @@ class App {
         `;
     }
 
-    // --- Racers View ---
     async renderRacers() {
         const racers = await db.getRacersAsync();
         const categories = await db.getCategoryAsync();
@@ -432,7 +418,7 @@ class App {
         `;
 
         this.contentElement.innerHTML = html;
-        this.currentRacers = racers; // cache for search
+        this.currentRacers = racers;
     }
 
     _createRacerCardHTML(racer) {
@@ -511,7 +497,7 @@ class App {
         if (categoryName.includes('Age:22-25') && (age < 22 || age > 25)) {
             return "For the Pro category, age must be between 22 and 25.";
         }
-        return null; // Valid
+        return null;
     }
 
     async submitAddRacer() {
@@ -628,11 +614,9 @@ class App {
         }
     }
 
-    // --- Events View ---
     async renderEvents() {
         const races = await db.getRacesAsync();
 
-        // Split into active and expired based on Date
         const now = new Date();
         const activeRaces = [];
         const expiredRaces = [];
@@ -774,7 +758,6 @@ class App {
         }
     }
 
-    // --- Tracks View ---
     async renderTracks() {
         const tracks = await db.getTracksAsync();
 
@@ -931,16 +914,13 @@ class App {
         }
     }
 
-    // --- Modal Utils ---
     closeModal() {
         this.modalContainer.classList.add('hidden');
     }
 }
 
-// Initialize application
 window.app = new App();
 app.renderAuthNav();
-// Initial route load
 if (window.location.hash) {
     const view = window.location.hash.substring(1);
     window.app.navigate(view);

@@ -1,6 +1,3 @@
-// Database service using Firebase Firestore
-
-// IMPORTANT: Replace this config object with your real Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBtSBco8Q4emaDbLlr_pnpSsiWGPRqoRi4",
   authDomain: "motocross-web-app-2561d.firebaseapp.com",
@@ -11,7 +8,6 @@ const firebaseConfig = {
   measurementId: "G-P955DS8RW0"
 };
 
-// Initialize Firebase
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
@@ -19,16 +15,12 @@ if (!firebase.apps.length) {
 const firestore = firebase.firestore();
 const auth = firebase.auth();
 
-// ============================================================
-// Authentication Service
-// ============================================================
 class AuthService {
     constructor() {
         this.currentUser = null;
-        this.userRole = null; // 'admin' | 'guest' | null
+        this.userRole = null;
         this._onAuthChangeCallbacks = [];
 
-        // Listen for Firebase auth state changes
         auth.onAuthStateChanged(async (user) => {
             this.currentUser = user;
             if (user) {
@@ -36,17 +28,14 @@ class AuthService {
             } else {
                 this.userRole = null;
             }
-            // Notify all registered callbacks
             this._onAuthChangeCallbacks.forEach(cb => cb(user, this.userRole));
         });
     }
 
-    /** Register a callback that fires whenever auth state changes */
     onAuthChange(callback) {
         this._onAuthChangeCallbacks.push(callback);
     }
 
-    /** Fetch the role for the given UID from the 'users' Firestore collection */
     async _fetchUserRole(uid) {
         try {
             const doc = await firestore.collection('users').doc(uid).get();
@@ -61,11 +50,9 @@ class AuthService {
         }
     }
 
-    /** Register a new account (always creates a 'guest' role) */
     async register(email, password) {
         const credential = await auth.createUserWithEmailAndPassword(email, password);
         const uid = credential.user.uid;
-        // Create a user document with role 'guest'
         await firestore.collection('users').doc(uid).set({
             email: email,
             role: 'guest',
@@ -75,25 +62,21 @@ class AuthService {
         return credential.user;
     }
 
-    /** Log in with email & password */
     async login(email, password) {
         const credential = await auth.signInWithEmailAndPassword(email, password);
         return credential.user;
     }
 
-    /** Log out */
     async logout() {
         await auth.signOut();
         this.currentUser = null;
         this.userRole = null;
     }
 
-    /** Check if current user is an admin */
     isAdmin() {
         return this.userRole === 'admin';
     }
 
-    /** Check if a user is logged in */
     isLoggedIn() {
         return this.currentUser !== null;
     }
@@ -101,9 +84,6 @@ class AuthService {
 
 window.authService = new AuthService();
 
-// ============================================================
-// Database Service
-// ============================================================
 class DatabaseService {
     constructor() {
         this.collections = {
@@ -113,7 +93,6 @@ class DatabaseService {
             categories: 'motocross_categories',
             tracks: 'motocross_tracks'
         };
-        // Seed categories if needed
         this._seedCategories();
     }
 
@@ -127,7 +106,6 @@ class DatabaseService {
                     { id: 3, name: 'Pro (Age:22-25) (Engine size: 450cc)' }
                 ];
                 for (const cat of initialCategories) {
-                    // Use the id as the document ID
                     await firestore.collection(this.collections.categories).doc(cat.id.toString()).set({ name: cat.name });
                 }
             }
@@ -136,13 +114,11 @@ class DatabaseService {
         }
     }
 
-    // Helper to get all documents from a collection
     async _getAll(collectionKey) {
         try {
             const snapshot = await firestore.collection(collectionKey).get();
             return snapshot.docs.map(doc => {
                 const data = doc.data();
-                // Ensure id is a number if it can be parsed as one, for compatibility with existing app.js
                 const numericId = parseInt(doc.id, 10);
                 return { 
                     id: isNaN(numericId) ? doc.id : numericId, 
@@ -155,7 +131,6 @@ class DatabaseService {
         }
     }
 
-    // --- Racers ---
     async getRacersAsync() {
         return await this._getAll(this.collections.racers);
     }
@@ -177,7 +152,6 @@ class DatabaseService {
         await firestore.collection(this.collections.racers).doc(id.toString()).delete();
     }
 
-    // --- Races ---
     async getRacesAsync() {
         return await this._getAll(this.collections.races);
     }
@@ -192,7 +166,6 @@ class DatabaseService {
         await firestore.collection(this.collections.races).doc(id.toString()).delete();
     }
 
-    // --- Tracks ---
     async getTracksAsync() {
         return await this._getAll(this.collections.tracks);
     }
@@ -214,7 +187,6 @@ class DatabaseService {
         await firestore.collection(this.collections.tracks).doc(id.toString()).delete();
     }
 
-    // --- Categories ---
     async getCategoryAsync() {
         return await this._getAll(this.collections.categories);
     }
